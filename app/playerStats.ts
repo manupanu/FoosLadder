@@ -19,8 +19,8 @@ export function getPlayerStats(playerId: string, games: Game[], players: Player[
   let gamesPlayed = 0;
   let wins = 0;
   let losses = 0;
-  let eloHistory: { date: string; elo: number }[] = [];
-  let currentElo = players.find(p => p.id === playerId)?.elo ?? 1000;
+  const eloHistory = [];
+  const currentElo = 1000;
   let redGames = 0, blueGames = 0, redWins = 0, blueWins = 0;
 
   // Sort games by date ascending
@@ -30,14 +30,12 @@ export function getPlayerStats(playerId: string, games: Game[], players: Player[
     // Defensive: skip games with missing red/blue arrays
     if (!game.red || !game.blue) continue;
     let involved = false;
-    let won = false;
     if (Array.isArray(game.red) && game.red.includes(playerId)) {
       involved = true;
       redGames++;
       if (game.redScore > game.blueScore) {
         wins++;
         redWins++;
-        won = true;
       } else {
         losses++;
       }
@@ -47,7 +45,6 @@ export function getPlayerStats(playerId: string, games: Game[], players: Player[
       if (game.blueScore > game.redScore) {
         wins++;
         blueWins++;
-        won = true;
       } else {
         losses++;
       }

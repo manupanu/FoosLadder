@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
 import { Player } from "./foosballTypes";
-import { getPlayers } from "./foosballData";
+import { getPlayers as getPlayersDb } from "./foosballData";
+import { useState, useEffect } from "react";
 import PlayerStatsPanel from "./PlayerStatsPanel";
 
 export default function Leaderboard() {
@@ -9,7 +9,7 @@ export default function Leaderboard() {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
 
   useEffect(() => {
-    setPlayers(getPlayers().sort((a, b) => b.elo - a.elo));
+    getPlayersDb().then(setPlayers);
   }, []);
 
   return (

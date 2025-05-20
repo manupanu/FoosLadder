@@ -1,25 +1,32 @@
 "use client";
-import { useState } from "react";
-import { Player } from "./foosballTypes";
-import { addPlayer, getPlayers } from "./foosballData";
+import { useState, useEffect } from "react";
+import { addPlayer as addPlayerDb, getPlayers as getPlayersDb } from "./foosballData";
 
 export default function AddPlayerForm({ onPlayerAdded }: { onPlayerAdded: () => void }) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    getPlayersDb();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
       setError("Player name required");
       return;
     }
+    setLoading(true);
     try {
-      addPlayer(name.trim());
+      await addPlayerDb(name.trim());
       setName("");
       setError("");
       onPlayerAdded();
-    } catch (err) {
-      setError("Could not add player");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : JSON.stringify(err));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,12 +39,14 @@ export default function AddPlayerForm({ onPlayerAdded }: { onPlayerAdded: () => 
         value={name}
         onChange={e => setName(e.target.value)}
         aria-label="Player name"
+        disabled={loading}
       />
       <button
         type="submit"
         className="btn-primary rounded px-3 py-1 font-semibold transition"
+        disabled={loading}
       >
-        Add
+        {loading ? "Adding..." : "Add"}
       </button>
       {error && <span className="text-burnt_sienna-500 text-xs ml-2">{error}</span>}
     </form>

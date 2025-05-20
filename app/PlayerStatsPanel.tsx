@@ -1,19 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Player, Game } from "./foosballTypes";
+import { Player } from "./foosballTypes";
 import { getPlayers, getGames } from "./foosballData";
 import { getPlayerStats } from "./playerStats";
 import PlayerEloChart from "./PlayerEloChart";
 
 export default function PlayerStatsPanel({ playerId, onClose }: { playerId: string; onClose: () => void }) {
   const [player, setPlayer] = useState<Player | null>(null);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<ReturnType<typeof getPlayerStats> | null>(null);
 
   useEffect(() => {
-    const players = getPlayers();
-    const games = getGames();
-    setPlayer(players.find(p => p.id === playerId) ?? null);
-    setStats(getPlayerStats(playerId, games, players));
+    const fetchData = async () => {
+      const players = await getPlayers();
+      const games = await getGames();
+      setPlayer(players.find(p => p.id === playerId) ?? null);
+      setStats(getPlayerStats(playerId, games, players));
+    };
+    fetchData();
   }, [playerId]);
 
   if (!player || !stats) return null;

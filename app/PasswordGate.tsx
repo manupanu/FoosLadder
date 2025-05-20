@@ -1,16 +1,14 @@
 "use client";
 import { useState } from "react";
 
-const PASSWORD = process.env.NEXT_PUBLIC_FOOSBALL_PASSWORD || process.env.FOOSBALL_PASSWORD || "";
-
-export default function PasswordGate({ children }: { children: React.ReactNode }) {
+export default function PasswordGate({ children, password }: { children: React.ReactNode; password: string }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [unlocked, setUnlocked] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input === PASSWORD) {
+    if (input === password) {
       setUnlocked(true);
       setError("");
     } else {

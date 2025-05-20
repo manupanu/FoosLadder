@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Player, Game } from "./foosballTypes";
 import { getPlayers, getGames } from "./foosballData";
 import { getPlayerStats } from "./playerStats";
 import { Line } from "react-chartjs-2";
@@ -20,10 +19,13 @@ export default function PlayerEloChart({ playerId }: { playerId: string }) {
   const [eloHistory, setEloHistory] = useState<{ date: string; elo: number }[]>([]);
 
   useEffect(() => {
-    const games = getGames();
-    const players = getPlayers();
-    const stats = getPlayerStats(playerId, games, players);
-    setEloHistory(stats.eloHistory);
+    const fetchData = async () => {
+      const games = await getGames();
+      const players = await getPlayers();
+      const stats = getPlayerStats(playerId, games, players);
+      setEloHistory(stats.eloHistory);
+    };
+    fetchData();
   }, [playerId]);
 
   if (!eloHistory.length) return <div className="text-xs text-gray-400">No ELO history</div>;
