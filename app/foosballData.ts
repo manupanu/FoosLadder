@@ -24,33 +24,53 @@ export function saveGames(games: Game[]) {
 
 // Add a new game and update ELOs
 export function addGame(
-  player1Id: string,
-  player2Id: string,
-  player1Score: number,
-  player2Score: number
+  red: string[],
+  blue: string[],
+  redScore: number,
+  blueScore: number
 ) {
   const players = getPlayers();
   const games = getGames();
-  const player1 = players.find((p) => p.id === player1Id);
-  const player2 = players.find((p) => p.id === player2Id);
-  if (!player1 || !player2) throw new Error("Player not found");
+  // Validate players
+  if (red.length < 1 || blue.length < 1)
+    throw new Error("Teams must have at least one player");
+  if (red.some((id) => blue.includes(id)))
+    throw new Error("A player cannot be on both teams");
+
+  // Calculate average ELO for each team
+  const redElo =
+    red.reduce(
+      (sum, id) => sum + (players.find((p) => p.id === id)?.elo ?? 1000),
+      0
+    ) / red.length;
+  const blueElo =
+    blue.reduce(
+      (sum, id) => sum + (players.find((p) => p.id === id)?.elo ?? 1000),
+      0
+    ) / blue.length;
 
   // Determine winner/loser
-  let p1Result: 0 | 1 = player1Score > player2Score ? 1 : 0;
-  let p2Result: 0 | 1 = player2Score > player1Score ? 1 : 0;
+  let redResult: 0 | 1 = redScore > blueScore ? 1 : 0;
+  let blueResult: 0 | 1 = blueScore > redScore ? 1 : 0;
 
-  // Update ELOs
-  player1.elo = calculateElo(player1.elo, player2.elo, p1Result);
-  player2.elo = calculateElo(player2.elo, player1.elo, p2Result);
+  // Update ELOs for each player
+  red.forEach((id) => {
+    const p = players.find((pl) => pl.id === id);
+    if (p) p.elo = calculateElo(p.elo, blueElo, redResult);
+  });
+  blue.forEach((id) => {
+    const p = players.find((pl) => pl.id === id);
+    if (p) p.elo = calculateElo(p.elo, redElo, blueResult);
+  });
 
   // Save new game
   games.push({
     id: uuidv4(),
     date: new Date().toISOString(),
-    player1Id,
-    player2Id,
-    player1Score,
-    player2Score,
+    red,
+    blue,
+    redScore,
+    blueScore,
   });
   saveGames(games);
   savePlayers(players);

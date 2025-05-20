@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { addPlayer } from "./foosballData";
+import { Player } from "./foosballTypes";
+import { addPlayer, getPlayers } from "./foosballData";
 
 export default function AddPlayerForm({ onPlayerAdded }: { onPlayerAdded: () => void }) {
   const [name, setName] = useState("");

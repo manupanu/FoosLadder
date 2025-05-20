@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react";
 import { Player } from "./foosballTypes";
 import { getPlayers } from "./foosballData";
+import PlayerStatsPanel from "./PlayerStatsPanel";
 
 export default function Leaderboard() {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
 
   useEffect(() => {
     setPlayers(getPlayers().sort((a, b) => b.elo - a.elo));
@@ -27,7 +29,8 @@ export default function Leaderboard() {
           {players.map((p, i) => (
             <tr
               key={p.id}
-              className="bg-leaderboard-row hover:bg-persian_green-400 transition"
+              className="bg-leaderboard-row hover:bg-persian_green-400 transition cursor-pointer"
+              onClick={() => setSelectedPlayer(p.id)}
             >
               <td className="px-2 font-mono">{i + 1}</td>
               <td className="px-2">{p.name}</td>
@@ -36,6 +39,12 @@ export default function Leaderboard() {
           ))}
         </tbody>
       </table>
+      {selectedPlayer && (
+        <PlayerStatsPanel
+          playerId={selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      )}
     </div>
   );
 }

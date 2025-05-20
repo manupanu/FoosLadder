@@ -8,10 +8,10 @@ export type Player = {
 export type Game = {
   id: string;
   date: string; // ISO string
-  player1Id: string;
-  player2Id: string;
-  player1Score: number;
-  player2Score: number;
+  red: string[]; // 1 or 2 player IDs
+  blue: string[]; // 1 or 2 player IDs
+  redScore: number;
+  blueScore: number;
 };
 
 // ELO calculation logic
