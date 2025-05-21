@@ -123,26 +123,39 @@ export default function AddGameForm({ onGameAdded }: { onGameAdded: () => void }
         <div key={`${team}-${idx}`} className="relative mb-3">
           <label htmlFor={`${team}-player-${idx + 1}`} className="sr-only">{`${teamColor.charAt(0).toUpperCase() + teamColor.slice(1)} Player ${idx + 1}`}</label>
           <select
-            id={`${team}-player-${idx + 1}`}
-            value={currentTeam[idx] || ""}
-            onChange={e => handleSelect(team, idx, e.target.value)}
-            className={`w-full border-2 ${currentBorder} rounded-lg px-4 py-3 bg-charcoal-600 text-charcoal-50 placeholder-charcoal-400 transition-all duration-150 ease-in-out ${focusRingColor} ${focusBorderColor} appearance-none disabled:opacity-60 shadow-sm hover:border-${teamColor}-400/80 focus:outline-none`}
-            aria-label={`${teamColor.charAt(0).toUpperCase() + teamColor.slice(1)} Player ${idx + 1}`}
-            disabled={loading}
+        id={`${team}-player-${idx + 1}`}
+        value={currentTeam[idx] || ""}
+        onChange={e => handleSelect(team, idx, e.target.value)}
+        className={`
+          w-full border-2 ${currentBorder} rounded-lg px-4 py-3
+          bg-charcoal-800 text-charcoal-50 placeholder-charcoal-400
+          transition-all duration-150 ease-in-out ${focusRingColor} ${focusBorderColor}
+          appearance-none disabled:opacity-60 shadow-sm
+          hover:border-${teamColor}-400/80 focus:outline-none
+          dark:bg-charcoal-900 dark:text-charcoal-100 dark:placeholder-charcoal-400
+          dark:border-charcoal-600/80 dark:focus:border-${teamColor}-400
+        `}
+        aria-label={`${teamColor.charAt(0).toUpperCase() + teamColor.slice(1)} Player ${idx + 1}`}
+        disabled={loading}
           >
-            <option value="" className="text-charcoal-300 bg-charcoal-700">-- Select Player {idx + 1} --</option>
-            {players
-              .filter(p => !otherTeam.includes(p.id) || p.id === currentTeam[idx])
-              .filter(p => !currentTeam.includes(p.id) || p.id === currentTeam[idx])
-              .map(p => (
-                <option key={p.id} value={p.id} className="text-charcoal-50 bg-charcoal-700 hover:bg-charcoal-500">{p.name}</option> // ELO removed
-              ))}
+        <option value="">-- Select Player {idx + 1} --</option>
+        {players
+          .filter(p => !otherTeam.includes(p.id) || p.id === currentTeam[idx])
+          .filter(p => !currentTeam.includes(p.id) || p.id === currentTeam[idx])
+          .map(p => (
+            <option
+          key={p.id}
+          value={p.id}
+            >
+          {p.name}
+            </option>
+          ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-charcoal-300">
-            <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-charcoal-300 dark:text-charcoal-400">
+        <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
           </div>
         </div>
-      );
+      ); // This closes the JSX return for the map callback
     });
   };
 
