@@ -15,7 +15,7 @@ export type PlayerStats = {
 };
 
 // Calculate stats for a player
-export function getPlayerStats(playerId: string, games: Game[], players: Player[]): PlayerStats {
+export function getPlayerStats(playerId: string, games: Game[]): PlayerStats {
   let gamesPlayed = 0;
   let wins = 0;
   let losses = 0;
