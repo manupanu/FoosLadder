@@ -21,8 +21,7 @@ export default function PlayerEloChart({ playerId }: { playerId: string }) {
   useEffect(() => {
     const fetchData = async () => {
       const games = await getGames();
-      const players = await getPlayers();
-      const stats = getPlayerStats(playerId, games, players);
+      const stats = getPlayerStats(playerId, games);
       setEloHistory(stats.eloHistory);
     };
     fetchData();
