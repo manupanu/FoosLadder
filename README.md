@@ -16,6 +16,7 @@ FoosLadder is a modern, clean, and responsive Next.js application designed to tr
 - **Password Protection**: A simple login page protects access to the app.
 - **Supabase Backend**: All data (players, games) is stored in a Supabase PostgreSQL database, ensuring data persistence and reliability.
 - **TypeScript First**: Developed with TypeScript for improved code quality and maintainability.
+- **Cloudflare Tunnel Integration**: Exposes the local development server to the internet via Cloudflare Tunnel for easy sharing and testing.
 
 ## Tech Stack
 
@@ -24,6 +25,7 @@ FoosLadder is a modern, clean, and responsive Next.js application designed to tr
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) (v4+) with a custom color palette
 - **Database**: [Supabase](https://supabase.io/) (PostgreSQL)
 - **Charting**: [Chart.js](https://www.chartjs.org/) with `react-chartjs-2`
+- **Deployment**: Docker, Docker Compose, Cloudflare Tunnel
 - **UI Components**: Custom-built React functional components with Hooks
 - **Linting/Formatting**: ESLint & Prettier (assumed setup)
 
@@ -60,13 +62,14 @@ FoosLadder is a modern, clean, and responsive Next.js application designed to tr
    - In your Supabase project settings, find your API URL and `anon` key.
 
 4. **Configure Environment Variables:**
-   - Create a `.env.local` file in the root of the project.
-   - Add your Supabase credentials and a password for the login page:
+   - Create a `.env.local` file in the root of the project by copying `.env.example`.
+   - Add your Supabase credentials, a password for the login page, and your Cloudflare Tunnel token:
 
      ```env
      NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
      NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
      NEXT_PUBLIC_FOOSBALL_PASSWORD=your_chosen_password
+     CLOUDFLARED_TUNNEL_TOKEN=your_cloudflared_tunnel_token
      ```
 
 5. **Run the development server:**
@@ -97,7 +100,7 @@ You can run FoosLadder using Docker or Docker Compose for easy deployment.
 
 - [Docker](https://www.docker.com/get-started) installed
 - (Optional) [Docker Compose](https://docs.docker.com/compose/) for multi-container management
-- A `.env.local` file in the project root with your Supabase credentials and app password, or set the environment variables directly
+- A `.env` file in the project root with your Supabase credentials, app password and Cloudflare Tunnel token, or set the environment variables directly
 
 ### 1. Build and Run with Docker (Standalone)
 
@@ -115,19 +118,20 @@ docker run -p 3000:3000 \
 
 ### 2. Run with Docker Compose
 
-1. Ensure your `.env.local` file is present in the project root, or set the required environment variables in your environment.
-2. Start the app:
+1. Ensure your `.env` file is present in the project root (you can copy `.env.example` and fill in the values).
+2. Start the app and the Cloudflare Tunnel:
 
 ```sh
 docker compose up --build
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).
+The app will be available at [http://localhost:3000](http://localhost:3000) and also accessible via the Cloudflare Tunnel URL provided in the `cloudflared` service logs.
 
 > **Note:**
 >
-> - The container expects the following environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_FOOSBALL_PASSWORD`.
-> - The default exposed port is `3000`. You can change the host port in `docker-compose.yml` if needed.
+> - The `foosladder` container expects the following environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_FOOSBALL_PASSWORD`.
+> - The `cloudflared` container expects the `CLOUDFLARED_TUNNEL_TOKEN` environment variable.
+> - The default exposed port for the FoosLadder app is `3000`. You can change the host port in `docker-compose.yml` if needed (though the primary access when using the tunnel will be through the Cloudflare URL).
 
 ## Project Structure
 
@@ -152,6 +156,9 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 - `supabase_schema.sql`: SQL schema for the Supabase database tables.
 - `tailwind.config.js`: Configuration for Tailwind CSS, including the custom color palette.
 - `next.config.ts`, `tsconfig.json`, etc.: Standard Next.js and TypeScript configuration files.
+- `docker-compose.yml`: Defines the services for running the application and Cloudflare Tunnel with Docker Compose.
+- `Dockerfile`: Instructions for building the FoosLadder application Docker image.
+- `.env.example`: Example environment file.
 
 ## Color Palette
 
@@ -173,4 +180,4 @@ This project is open-source and available under the MIT License.
 
 ---
 
-_This README was last updated on May 23, 2024._
+_This README was last updated on May 21, 2025._
