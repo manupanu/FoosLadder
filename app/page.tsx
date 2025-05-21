@@ -47,10 +47,6 @@ export default function Home() {
             <LastGames refreshKey={refresh} />
           </div>
         </main>
-
-        <footer className="mt-12 text-sm text-charcoal-300 text-center">
-          Foosball Ladder &copy; {new Date().getFullYear()} - Built with ⚽ and 🔥
-        </footer>
       </div>
     </PasswordGate>
   );
