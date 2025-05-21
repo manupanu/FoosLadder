@@ -18,10 +18,21 @@ export async function addPlayer(name: string): Promise<void> {
 export async function getGames(): Promise<Game[]> {
   const { data, error } = await supabase
     .from("games")
-    .select("*")
+    .select("id, date, red_players, blue_players, red_score, blue_score") // Explicitly select columns
     .order("date", { ascending: true });
+
   if (error) throw error;
-  return data || [];
+  if (!data) return [];
+
+  // Map database columns to Game type properties
+  return data.map((game) => ({
+    id: game.id,
+    date: game.date,
+    red: game.red_players || [], // Ensure 'red' is an array
+    blue: game.blue_players || [], // Ensure 'blue' is an array
+    redScore: game.red_score,
+    blueScore: game.blue_score,
+  }));
 }
 
 // Add a new game and update ELOs
