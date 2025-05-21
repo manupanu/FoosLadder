@@ -11,39 +11,45 @@ import Image from "next/image"; // Import the Image component
 export default function Home() {
   const [refresh, setRefresh] = useState(0);
   const triggerRefresh = () => setRefresh((r) => r + 1);
-  // Read password from NEXT_PUBLIC_ env at build time (safe for hydration)
   const password = process.env.NEXT_PUBLIC_FOOSBALL_PASSWORD || "";
 
   return (
     <PasswordGate password={password}>
-      <div className="flex flex-col items-center gap-8 py-10 animate-fadeIn w-full min-h-screen bg-charcoal-500">
-        <div className="flex items-center gap-4 mb-2">
+      <div className="flex flex-col items-center gap-10 py-12 px-4 animate-fadeIn w-full min-h-screen bg-gradient-to-br from-charcoal-800 via-charcoal-700 to-charcoal-800 text-charcoal-50">
+        <header className="flex items-center gap-4 mb-4">
           <Image
             src="/foosball-logo.svg"
             alt="FoosLadder Logo"
-            width={60}
-            height={60}
+            width={64} // Slightly larger logo
+            height={64}
+            className="drop-shadow-lg"
           />
-          <h1 className="text-4xl font-bold text-saffron-500 drop-shadow tracking-tight text-center">
-            Foosball Ladder
+          <h1 className="text-5xl font-bold text-saffron-400 drop-shadow-md tracking-tight text-center">
+            Foosball Ladder 🏆
           </h1>
-        </div>
-        <div className="w-full max-w-5xl flex flex-col items-center gap-8 px-4">
-          <div className="w-full flex flex-col gap-4">
-            <div className="bg-charcoal-400/50 rounded-2xl p-6 backdrop-blur shadow-lg border border-charcoal-300/20">
+        </header>
+
+        {/* Main content grid - adjusted for wider forms */}
+        <main className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+          {/* Left column for forms - now wider */}
+          <div className="lg:col-span-2 flex flex-col gap-8">
+            <div className="bg-charcoal-700/60 rounded-xl p-6 shadow-xl border border-persian_green-500/30 backdrop-blur-sm">
               <AddPlayerForm onPlayerAdded={triggerRefresh} />
+            </div>
+            <div className="bg-charcoal-700/60 rounded-xl p-6 shadow-xl border border-persian_green-500/30 backdrop-blur-sm">
               <AddGameForm onGameAdded={triggerRefresh} />
             </div>
           </div>
-          <div className="w-full flex justify-center">
-            <Leaderboard key={refresh} />
-          </div>
-          <div className="w-full flex justify-center">
+
+          {/* Right column for leaderboard and last games - they will share this width */}
+          <div className="lg:col-span-3 flex flex-col gap-8">
+            <Leaderboard key={`leaderboard-${refresh}`} />
             <LastGames refreshKey={refresh} />
           </div>
-        </div>
-        <footer className="mt-10 text-xs text-sandy_brown-700 text-center">
-          Foosball App &copy; 2025 - Manuel Anrig
+        </main>
+
+        <footer className="mt-12 text-sm text-charcoal-300 text-center">
+          Foosball Ladder &copy; {new Date().getFullYear()} - Built with ⚽ and 🔥
         </footer>
       </div>
     </PasswordGate>

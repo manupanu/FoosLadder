@@ -5,153 +5,216 @@ import { useState, useEffect } from "react";
 
 export default function AddGameForm({ onGameAdded }: { onGameAdded: () => void }) {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [red, setRed] = useState<string[]>([]);
-  const [blue, setBlue] = useState<string[]>([]);
+  const [redTeam, setRedTeam] = useState<string[]>([]);
+  const [blueTeam, setBlueTeam] = useState<string[]>([]);
   const [scoreRed, setScoreRed] = useState("");
   const [scoreBlue, setScoreBlue] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getPlayersDb().then(setPlayers);
+    const fetchPlayers = async () => {
+      try {
+        const playersData = await getPlayersDb();
+        setPlayers(playersData);
+      } catch (err) {
+        setError("Failed to load players for the form. 😬");
+        console.error("Error fetching players for form:", err);
+      }
+    };
+    fetchPlayers();
   }, []);
 
-  // Helper to handle dropdown selection for a team
-  const handleSelect = (team: "red" | "blue", idx: number, value: string) => {
-    if (team === "red") {
-      const updated = [...red];
-      updated[idx] = value;
-      setRed(updated.filter(Boolean));
-      // Remove from blue if selected
-      setBlue(blue.filter((id) => id !== value));
-    } else {
-      const updated = [...blue];
-      updated[idx] = value;
-      setBlue(updated.filter(Boolean));
-      setRed(red.filter((id) => id !== value));
+  // Clear messages after a delay
+  useEffect(() => {
+    if (error || successMessage) {
+      const timer = setTimeout(() => {
+        setError(null);
+        setSuccessMessage(null);
+      }, 4000); // Clear messages after 4 seconds
+      return () => clearTimeout(timer);
     }
+  }, [error, successMessage]);
+
+  const handleSelect = (team: "red" | "blue", playerIndex: number, playerId: string) => {
+    setError(null); // Clear error on interaction
+    const otherTeam = team === "red" ? blueTeam : redTeam;
+    const currentTeam = team === "red" ? redTeam : blueTeam;
+    const setTeam = team === "red" ? setRedTeam : setBlueTeam;
+
+    // If player is already on the other team, do nothing or show error (already handled by filter)
+    if (otherTeam.includes(playerId) && playerId !== "") {
+        setError("Player cannot be on both teams! 🙅");
+        return;
+    }
+
+    const updatedTeam = [...currentTeam];
+    // Ensure player is not already selected on the same team in a different slot
+    if (playerId !== "" && updatedTeam.some((p, idx) => p === playerId && idx !== playerIndex)) {
+        setError("Player already selected for this team. 🤔");
+        return;
+    }
+
+    updatedTeam[playerIndex] = playerId;
+    // Filter out empty strings if a player is deselected
+    setTeam(updatedTeam.filter(p => p !== ""));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (red.length < 1 || blue.length < 1) {
-      setError("Each team must have at least one player");
+    setError(null);
+    setSuccessMessage(null);
+
+    if (redTeam.length === 0 || blueTeam.length === 0) {
+      setError("Both teams need at least one player. 🧍‍♂️🧍‍♀️");
       return;
     }
-    if (red.some(id => blue.includes(id))) {
-      setError("A player cannot be on both teams");
+    if (redTeam.some(id => blueTeam.includes(id))) {
+      setError("A player cannot be on both teams! 🙅"); // Should be caught by handleSelect too
       return;
     }
     const sRed = parseInt(scoreRed, 10);
     const sBlue = parseInt(scoreBlue, 10);
-    if (isNaN(sRed) || isNaN(sBlue)) {
-      setError("Scores must be numbers");
+    if (isNaN(sRed) || isNaN(sBlue) || sRed < 0 || sBlue < 0) {
+      setError("Scores must be valid numbers (0 or more). 🔢");
       return;
     }
+    if (sRed === sBlue) {
+      setError("Games cannot end in a draw. One team must win! ⚔️");
+      return;
+    }
+
     setLoading(true);
     try {
-      await addGameDb(red, blue, sRed, sBlue);
-      setRed([]);
-      setBlue([]);
+      await addGameDb(redTeam, blueTeam, sRed, sBlue);
+      setSuccessMessage("Game added successfully! 🚀");
+      setRedTeam([]);
+      setBlueTeam([]);
       setScoreRed("");
       setScoreBlue("");
-      setError("");
-      onGameAdded();
-      setPlayers(await getPlayersDb());
+      onGameAdded(); // Refresh leaderboard and last games
+      // Optionally re-fetch players if their ELO might change immediately and affect dropdowns, though current ELO isn't shown here.
+      // setPlayers(await getPlayersDb());
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : JSON.stringify(err));
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(`Failed to add game: ${errorMessage} 💔`);
+      console.error("Error adding game:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper to render dropdowns for a team
-  const renderDropdowns = (team: "red" | "blue") => {
-    const teamArr = team === "red" ? red : blue;
-    return [0, 1].map((idx) => (
-      <div key={idx} className="relative mb-2">
-        <select
-          value={teamArr[idx] || ""}
-          onChange={e => handleSelect(team, idx, e.target.value)}
-          className={`border-2 border-persian_green-500 rounded-lg px-4 py-2 flex-1 bg-charcoal-400 text-saffron-900 focus:bg-charcoal-400 focus:text-saffron-900 placeholder:text-charcoal-700 focus:ring-2 focus:ring-persian_green-400 focus:border-persian_green-500 focus:outline-none text-lg font-semibold shadow-md transition-all duration-150 pr-10 hover:border-persian_green-400 cursor-pointer appearance-none w-full min-w-[120px]`}
-          aria-label={`${team.charAt(0).toUpperCase() + team.slice(1)} Player ${idx + 1}`}
-          style={{ backgroundColor: '#1f3943', color: '#faf3e1' }}
-        >
-          <option value="" className="text-charcoal-700 font-normal bg-charcoal-400">{team.charAt(0).toUpperCase() + team.slice(1)} Player {idx + 1}</option>
-          {players
-            .filter(p => (team === "red" ? !blue.includes(p.id) : !red.includes(p.id)))
-            .map(p => (
-              <option key={p.id} value={p.id} className="text-charcoal-900 font-semibold bg-charcoal-400">{p.name}</option>
-            ))}
-        </select>
-        {/* Chevron icon for dropdown */}
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-persian_green-500 text-xl">
-          ▼
-        </span>
-      </div>
-    ));
+  const renderPlayerDropdowns = (team: "red" | "blue") => {
+    const currentTeam = team === "red" ? redTeam : blueTeam;
+    const otherTeam = team === "red" ? blueTeam : redTeam;
+    const teamColor = team === "red" ? "red" : "blue";
+    // Define border colors based on team and selection state for a more dynamic feel
+    const baseBorderColor = "border-charcoal-500/70";
+    const selectedBorderColor = team === "red" ? "border-red-500/70" : "border-blue-500/70";
+    const focusRingColor = team === "red" ? "focus:ring-red-500" : "focus:ring-blue-500";
+    const focusBorderColor = team === "red" ? "focus:border-red-500" : "focus:border-blue-500";
+
+    return [0, 1].map((idx) => {
+      const isSelected = currentTeam[idx] && currentTeam[idx] !== "";
+      const currentBorder = isSelected ? selectedBorderColor : baseBorderColor;
+
+      return (
+        <div key={`${team}-${idx}`} className="relative mb-3">
+          <label htmlFor={`${team}-player-${idx + 1}`} className="sr-only">{`${teamColor.charAt(0).toUpperCase() + teamColor.slice(1)} Player ${idx + 1}`}</label>
+          <select
+            id={`${team}-player-${idx + 1}`}
+            value={currentTeam[idx] || ""}
+            onChange={e => handleSelect(team, idx, e.target.value)}
+            className={`w-full border-2 ${currentBorder} rounded-lg px-4 py-3 bg-charcoal-600 text-charcoal-50 placeholder-charcoal-400 transition-all duration-150 ease-in-out ${focusRingColor} ${focusBorderColor} appearance-none disabled:opacity-60 shadow-sm hover:border-${teamColor}-400/80 focus:outline-none`}
+            aria-label={`${teamColor.charAt(0).toUpperCase() + teamColor.slice(1)} Player ${idx + 1}`}
+            disabled={loading}
+          >
+            <option value="" className="text-charcoal-300 bg-charcoal-700">-- Select Player {idx + 1} --</option>
+            {players
+              .filter(p => !otherTeam.includes(p.id) || p.id === currentTeam[idx])
+              .filter(p => !currentTeam.includes(p.id) || p.id === currentTeam[idx])
+              .map(p => (
+                <option key={p.id} value={p.id} className="text-charcoal-50 bg-charcoal-700 hover:bg-charcoal-500">{p.name}</option> // ELO removed
+              ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-charcoal-300">
+            <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+          </div>
+        </div>
+      );
+    });
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-6 w-full max-w-2xl mt-6 animate-fadeInUp mx-auto"
-    >
-      <div className="flex flex-col sm:flex-row gap-6 w-full items-stretch">
-        {/* Red Team Card */}
-        <div className="flex-1 min-w-[180px]">
-          <div className="bg-charcoal-400 rounded-2xl p-6 shadow-lg border border-persian_green-500/20">
-            <label className="block text-xs text-persian_green-500 mb-4 font-bold tracking-widest uppercase text-center">
-              Red Team
-            </label>
-            {renderDropdowns("red")}
-            <div className="mt-4">
+    <div className="w-full mx-auto animate-fadeInUp">
+      <h3 className="text-2xl font-semibold text-saffron-400 mb-6 text-center">🎯 Record New Game</h3>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          {/* Red Team Section */}
+          <div className={`bg-charcoal-600/50 p-5 rounded-lg shadow-lg border transition-colors duration-200 ${redTeam.length > 0 ? 'border-red-500/50' : 'border-charcoal-500/40'}`}>
+            <h4 className="text-xl font-semibold text-red-400 mb-4 text-center">🔴 Red Team</h4>
+            {renderPlayerDropdowns("red")}
+            <div>
+              <label htmlFor="scoreRed" className="sr-only">Red Team Score</label>
               <input
+                id="scoreRed"
                 type="number"
+                min="0"
                 value={scoreRed}
                 onChange={e => setScoreRed(e.target.value)}
-                className="w-full text-center px-4 py-3 bg-charcoal-300 border-2 border-persian_green-500/30 rounded-xl text-2xl font-bold text-saffron-500 placeholder:text-charcoal-700 focus:ring-persian_green-500 focus:border-persian_green-500 focus:bg-charcoal-400 transition"
-                placeholder="0"
-                aria-label="Red Score"
+                className="w-full text-center px-4 py-3 bg-charcoal-600 border-2 border-red-500/50 rounded-lg text-2xl font-bold text-red-300 placeholder-charcoal-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500/80 transition disabled:opacity-60 shadow-sm"
+                placeholder="Score"
+                aria-label="Red Team Score"
+                disabled={loading}
               />
             </div>
           </div>
-        </div>
 
-        {/* Blue Team Card */}
-        <div className="flex-1 min-w-[180px]">
-          <div className="bg-charcoal-400 rounded-2xl p-6 shadow-lg border border-persian_green-500/20">
-            <label className="block text-xs text-persian_green-500 mb-4 font-bold tracking-widest uppercase text-center">
-              Blue Team
-            </label>
-            {renderDropdowns("blue")}
-            <div className="mt-4">
+          {/* Blue Team Section */}
+          <div className={`bg-charcoal-600/50 p-5 rounded-lg shadow-lg border transition-colors duration-200 ${blueTeam.length > 0 ? 'border-blue-500/50' : 'border-charcoal-500/40'}`}>
+            <h4 className="text-xl font-semibold text-blue-400 mb-4 text-center">🔵 Blue Team</h4>
+            {renderPlayerDropdowns("blue")}
+            <div>
+              <label htmlFor="scoreBlue" className="sr-only">Blue Team Score</label>
               <input
+                id="scoreBlue"
                 type="number"
+                min="0"
                 value={scoreBlue}
                 onChange={e => setScoreBlue(e.target.value)}
-                className="w-full text-center px-4 py-3 bg-charcoal-300 border-2 border-persian_green-500/30 rounded-xl text-2xl font-bold text-saffron-500 placeholder:text-charcoal-700 focus:ring-persian_green-500 focus:border-persian_green-500 focus:bg-charcoal-400 transition"
-                placeholder="0"
-                aria-label="Blue Score"
+                className="w-full text-center px-4 py-3 bg-charcoal-600 border-2 border-blue-500/50 rounded-lg text-2xl font-bold text-blue-300 placeholder-charcoal-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500/80 transition disabled:opacity-60 shadow-sm"
+                placeholder="Score"
+                aria-label="Blue Team Score"
+                disabled={loading}
               />
             </div>
           </div>
         </div>
-      </div>
 
-      <button
-        type="submit"
-        className="w-full max-w-md mx-auto btn-primary rounded-xl px-6 py-3 font-bold text-lg transition hover:scale-[1.02] focus:ring-2 focus:ring-persian_green-400 disabled:opacity-50 disabled:hover:scale-100"
-        disabled={loading}
-      >
-        {loading ? "Adding..." : "Add Game"}
-      </button>
-      
-      {error && (
-        <div className="text-burnt_sienna-500 text-sm text-center mt-2 bg-burnt_sienna-500/10 rounded-lg py-2 px-4">
-          {error}
-        </div>
-      )}
-    </form>
+        <button
+          type="submit"
+          className="w-full bg-gradient-to-r from-persian_green-500 to-persian_green-600 hover:from-persian_green-600 hover:to-persian_green-700 text-white font-bold rounded-lg px-6 py-4 text-lg transition-all duration-150 ease-in-out shadow-md hover:shadow-persian_green-500/40 focus:outline-none focus:ring-2 focus:ring-persian_green-400 focus:ring-offset-2 focus:ring-offset-charcoal-700 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform active:scale-95 hover:scale-[1.01]"
+          disabled={loading || !players.length} // Also disable if players haven't loaded
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Submitting Game...
+            </>
+          ) : "Submit Game Result 🚀"} 
+        </button>
+
+        {error && (
+          <p role="alert" className="text-sm text-red-300 bg-red-900/40 p-3 rounded-md text-center border border-red-500/60">{error}</p>
+        )}
+        {successMessage && (
+          <p role="status" className="text-sm text-green-300 bg-green-900/40 p-3 rounded-md text-center border border-green-500/60">{successMessage}</p>
+        )}
+      </form>
+    </div>
   );
 }
