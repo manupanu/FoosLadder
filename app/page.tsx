@@ -18,17 +18,15 @@ export default function Home() {
         <h1 className="text-3xl font-bold mb-2 text-saffron-500 drop-shadow tracking-tight text-center">
           Foosball Ladder
         </h1>
-        <div className="w-full flex flex-col items-center gap-8">
-          <div className="w-full max-w-5xl flex flex-col gap-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 w-full">
-              <div className="flex-1 flex flex-col gap-4">
-                <AddPlayerForm onPlayerAdded={triggerRefresh} />
-                <AddGameForm onGameAdded={triggerRefresh} />
-              </div>
+        <div className="w-full max-w-5xl flex flex-col items-center gap-8 px-4">
+          <div className="w-full flex flex-col gap-4">
+            <div className="bg-charcoal-400/50 rounded-2xl p-6 backdrop-blur shadow-lg border border-charcoal-300/20">
+              <AddPlayerForm onPlayerAdded={triggerRefresh} />
+              <AddGameForm onGameAdded={triggerRefresh} />
             </div>
-            <div className="w-full flex justify-center">
-              <Leaderboard key={refresh} />
-            </div>
+          </div>
+          <div className="w-full flex justify-center">
+            <Leaderboard key={refresh} />
           </div>
         </div>
         <footer className="mt-10 text-xs text-sandy_brown-700 text-center">

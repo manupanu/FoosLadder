@@ -95,46 +95,63 @@ export default function AddGameForm({ onGameAdded }: { onGameAdded: () => void }
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-6 w-full max-w-2xl animate-fadeInUp px-3 sm:px-0"
-      style={{ boxShadow: '0 4px 24px 0 rgba(42,157,143,0.10)' }}
+      className="flex flex-col gap-6 w-full max-w-2xl mt-6 animate-fadeInUp"
     >
       <div className="flex flex-col sm:flex-row gap-6 w-full items-stretch">
-        <div className="flex flex-col gap-3 flex-1 min-w-[180px] bg-charcoal-400 rounded-2xl p-6 shadow-lg border border-charcoal-300 justify-center">
-          <label className="block text-xs text-saffron-500 mb-2 font-semibold tracking-widest uppercase">Red Team</label>
-          {renderDropdowns("red")}
+        {/* Red Team Card */}
+        <div className="flex-1 min-w-[180px]">
+          <div className="bg-charcoal-400 rounded-2xl p-6 shadow-lg border border-persian_green-500/20">
+            <label className="block text-xs text-persian_green-500 mb-4 font-bold tracking-widest uppercase text-center">
+              Red Team
+            </label>
+            {renderDropdowns("red")}
+            <div className="mt-4">
+              <input
+                type="number"
+                value={scoreRed}
+                onChange={e => setScoreRed(e.target.value)}
+                className="w-full text-center px-4 py-3 bg-charcoal-300 border-2 border-persian_green-500/30 rounded-xl text-2xl font-bold text-saffron-500 placeholder:text-charcoal-700 focus:ring-persian_green-500 focus:border-persian_green-500 focus:bg-charcoal-400 transition"
+                placeholder="0"
+                aria-label="Red Score"
+              />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-3 flex-1 min-w-[180px] bg-charcoal-400 rounded-2xl p-6 shadow-lg border border-charcoal-300 justify-center">
-          <label className="block text-xs text-saffron-500 mb-2 font-semibold tracking-widest uppercase">Blue Team</label>
-          {renderDropdowns("blue")}
-        </div>
-        <div className="flex flex-col gap-3 flex-1 min-w-[140px] bg-charcoal-400 rounded-2xl p-6 shadow-lg border border-charcoal-300 justify-center">
-          <label className="block text-xs text-saffron-500 mb-2 font-semibold tracking-widest uppercase">Scores</label>
-          <input
-            type="number"
-            value={scoreRed}
-            onChange={e => setScoreRed(e.target.value)}
-            className="border rounded px-3 py-2 w-full bg-charcoal-300 text-saffron-900 placeholder:text-charcoal-700 focus:ring-persian_green-500 focus:bg-charcoal-400 focus:text-saffron-900 text-lg font-semibold mb-1 transition"
-            placeholder="Red Score"
-            aria-label="Red Score"
-          />
-          <input
-            type="number"
-            value={scoreBlue}
-            onChange={e => setScoreBlue(e.target.value)}
-            className="border rounded px-3 py-2 w-full bg-charcoal-300 text-saffron-900 placeholder:text-charcoal-700 focus:ring-persian_green-500 focus:bg-charcoal-400 focus:text-saffron-900 text-lg font-semibold mb-2 transition"
-            placeholder="Blue Score"
-            aria-label="Blue Score"
-          />
-          <button
-            type="submit"
-            className="btn-primary rounded-lg px-4 py-2 font-semibold transition w-full mt-2 text-base shadow-sm hover:scale-[1.02] focus:ring-2 focus:ring-persian_green-400"
-            disabled={loading}
-          >
-            {loading ? "Adding..." : "Add Game"}
-          </button>
-          {error && <span className="text-burnt_sienna-500 text-xs block mt-2">{error}</span>}
+
+        {/* Blue Team Card */}
+        <div className="flex-1 min-w-[180px]">
+          <div className="bg-charcoal-400 rounded-2xl p-6 shadow-lg border border-persian_green-500/20">
+            <label className="block text-xs text-persian_green-500 mb-4 font-bold tracking-widest uppercase text-center">
+              Blue Team
+            </label>
+            {renderDropdowns("blue")}
+            <div className="mt-4">
+              <input
+                type="number"
+                value={scoreBlue}
+                onChange={e => setScoreBlue(e.target.value)}
+                className="w-full text-center px-4 py-3 bg-charcoal-300 border-2 border-persian_green-500/30 rounded-xl text-2xl font-bold text-saffron-500 placeholder:text-charcoal-700 focus:ring-persian_green-500 focus:border-persian_green-500 focus:bg-charcoal-400 transition"
+                placeholder="0"
+                aria-label="Blue Score"
+              />
+            </div>
+          </div>
         </div>
       </div>
+
+      <button
+        type="submit"
+        className="w-full max-w-md mx-auto btn-primary rounded-xl px-6 py-3 font-bold text-lg transition hover:scale-[1.02] focus:ring-2 focus:ring-persian_green-400 disabled:opacity-50 disabled:hover:scale-100"
+        disabled={loading}
+      >
+        {loading ? "Adding..." : "Add Game"}
+      </button>
+      
+      {error && (
+        <div className="text-burnt_sienna-500 text-sm text-center mt-2 bg-burnt_sienna-500/10 rounded-lg py-2 px-4">
+          {error}
+        </div>
+      )}
     </form>
   );
 }
