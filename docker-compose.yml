@@ -7,8 +7,12 @@ services:
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
         NEXT_PUBLIC_FOOSBALL_PASSWORD: ${NEXT_PUBLIC_FOOSBALL_PASSWORD}
-    ports:
-      - "3000:3000"
+    # ports:
+      # - "3000:3000"
     env_file:
       - .env
+  cloudflared:
+    command: 'tunnel --no-autoupdate run --token ${CLOUDFLARED_TUNNEL_TOKEN}'
+    image: 'cloudflare/cloudflared:latest'
+
 # Ensure you have a .env file or set these environment variables in your VPS environment
