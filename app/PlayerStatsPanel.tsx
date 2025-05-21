@@ -22,8 +22,14 @@ export default function PlayerStatsPanel({ playerId, onClose }: { playerId: stri
   if (!player || !stats) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-charcoal-700 to-charcoal-800 rounded-xl shadow-2xl p-6 w-full max-w-md relative animate-fadeInUp border border-persian_green-500/30">
+    <div
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose} // Add onClick to the backdrop
+    >
+      <div
+        className="bg-gradient-to-br from-charcoal-700 to-charcoal-800 rounded-xl shadow-2xl p-6 w-full max-w-md relative animate-fadeInUp border border-persian_green-500/30"
+        onClick={(e) => e.stopPropagation()} // Prevent clicks inside the panel from closing it
+      >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-saffron-400 hover:text-saffron-300 text-3xl font-light transition-colors"
