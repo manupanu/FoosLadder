@@ -89,6 +89,46 @@ npm run build
 npm run start
 ```
 
+## Running with Docker
+
+You can run FoosLadder using Docker or Docker Compose for easy deployment.
+
+**Requirements:**
+
+- [Docker](https://www.docker.com/get-started) installed
+- (Optional) [Docker Compose](https://docs.docker.com/compose/) for multi-container management
+- A `.env.local` file in the project root with your Supabase credentials and app password, or set the environment variables directly
+
+### 1. Build and Run with Docker (Standalone)
+
+```sh
+# Build the Docker image
+docker build -t foosladder .
+
+# Run the container (make sure to set environment variables or mount your .env.local)
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url \
+  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key \
+  -e NEXT_PUBLIC_FOOSBALL_PASSWORD=your_chosen_password \
+  foosladder
+```
+
+### 2. Run with Docker Compose
+
+1. Ensure your `.env.local` file is present in the project root, or set the required environment variables in your environment.
+2. Start the app:
+
+```sh
+docker compose up --build
+```
+
+The app will be available at [http://localhost:3000](http://localhost:3000).
+
+> **Note:**
+>
+> - The container expects the following environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_FOOSBALL_PASSWORD`.
+> - The default exposed port is `3000`. You can change the host port in `docker-compose.yml` if needed.
+
 ## Project Structure
 
 - `app/`: Contains all the Next.js pages, components, and core application logic.
