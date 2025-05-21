@@ -1,4 +1,4 @@
-import { Player, Game } from "./foosballTypes";
+import { Game } from "./foosballTypes";
 
 export type PlayerStats = {
   gamesPlayed: number;
