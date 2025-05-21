@@ -95,7 +95,7 @@ export default function AddGameForm({ onGameAdded }: { onGameAdded: () => void }
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-6 w-full max-w-2xl mt-6 animate-fadeInUp"
+      className="flex flex-col gap-6 w-full max-w-2xl mt-6 animate-fadeInUp mx-auto"
     >
       <div className="flex flex-col sm:flex-row gap-6 w-full items-stretch">
         {/* Red Team Card */}

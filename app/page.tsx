@@ -3,6 +3,7 @@
 import AddPlayerForm from "./AddPlayerForm";
 import AddGameForm from "./AddGameForm";
 import Leaderboard from "./Leaderboard";
+import LastGames from "./LastGames";
 import { useState } from "react";
 import PasswordGate from "./PasswordGate";
 
@@ -27,6 +28,9 @@ export default function Home() {
           </div>
           <div className="w-full flex justify-center">
             <Leaderboard key={refresh} />
+          </div>
+          <div className="w-full flex justify-center">
+            <LastGames refreshKey={refresh} />
           </div>
         </div>
         <footer className="mt-10 text-xs text-sandy_brown-700 text-center">
