@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { addPlayer as addPlayerDb, getPlayers as getPlayersDb } from "./foosballData";
+import { addPlayer as addPlayerDb } from "./foosballData";
 
 export default function AddPlayerForm({ onPlayerAdded }: { onPlayerAdded: () => void }) {
   const [name, setName] = useState("");

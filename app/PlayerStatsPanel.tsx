@@ -8,7 +8,6 @@ import PlayerEloChart from "./PlayerEloChart";
 export default function PlayerStatsPanel({ playerId, onClose }: { playerId: string; onClose: () => void }) {
   const [player, setPlayer] = useState<Player | null>(null);
   const [stats, setStats] = useState<ReturnType<typeof getPlayerStats> | null>(null);
-  const [eloHistory, setEloHistory] = useState<{date: string, elo: number}[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
