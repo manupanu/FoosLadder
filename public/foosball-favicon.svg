@@ -1,0 +1,28 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="30" fill="#264653" stroke="#2A9D8F" stroke-width="2"/>
+  
+  <!-- Foosball Table Simplified -->
+  <rect x="16" y="19" width="32" height="26" rx="2" fill="#2A9D8F"/>
+  <rect x="18" y="21" width="28" height="22" rx="1" fill="#E9C46A" opacity="0.9"/>
+  
+  <!-- Rods Simplified -->
+  <rect x="14" y="24" width="36" height="2" rx="1" fill="#E76F51"/>
+  <rect x="14" y="32" width="36" height="2" rx="1" fill="#E76F51"/>
+  <rect x="14" y="40" width="36" height="2" rx="1" fill="#E76F51"/>
+  
+  <!-- Players Simplified -->
+  <circle cx="20" y="25" r="2.5" fill="#264653"/>
+  <circle cx="28" y="25" r="2.5" fill="#264653"/>
+  <circle cx="36" y="25" r="2.5" fill="#264653"/>
+  <circle cx="44" y="25" r="2.5" fill="#264653"/>
+  
+  <circle cx="24" y="33" r="2.5" fill="#E76F51"/>
+  <circle cx="32" y="33" r="2.5" fill="#E76F51"/>
+  <circle cx="40" y="33" r="2.5" fill="#E76F51"/>
+  
+  <circle cx="20" y="41" r="2.5" fill="#264653"/>
+  <circle cx="28" y="41" r="2.5" fill="#264653"/>
+  <circle cx="36" y="41" r="2.5" fill="#264653"/>
+  <circle cx="44" y="41" r="2.5" fill="#264653"/>
+</svg>
