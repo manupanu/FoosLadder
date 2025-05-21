@@ -14,7 +14,7 @@ export default function PlayerStatsPanel({ playerId, onClose }: { playerId: stri
       const players = await getPlayers();
       const games = await getGames();
       setPlayer(players.find(p => p.id === playerId) ?? null);
-      setStats(getPlayerStats(playerId, games, players));
+      setStats(getPlayerStats(playerId, games));
     };
     fetchData();
   }, [playerId]);

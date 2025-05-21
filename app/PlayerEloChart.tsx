@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getPlayers, getGames } from "./foosballData";
+import { getGames } from "./foosballData";
 import { getPlayerStats } from "./playerStats";
 import { Line } from "react-chartjs-2";
 import {
