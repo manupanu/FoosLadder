@@ -1,9 +1,12 @@
-version: '3.8'
 services:
   foosladder:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_FOOSBALL_PASSWORD: ${NEXT_PUBLIC_FOOSBALL_PASSWORD}
     ports:
       - "3000:3000"
     env_file:

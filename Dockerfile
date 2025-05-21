@@ -24,6 +24,17 @@ RUN \
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Accept build arguments for Supabase credentials
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_FOOSBALL_PASSWORD
+
+# Set them as environment variables for the build
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_FOOSBALL_PASSWORD=$NEXT_PUBLIC_FOOSBALL_PASSWORD
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
