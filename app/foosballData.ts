@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
-import { Player, Game, calculateElo } from "./foosballTypes";
+import { Player, Game, calculateElo, calculateTeamAverageElo } from "./foosballTypes";
 
 // Helper function to handle Supabase configuration errors
 const checkSupabaseConfig = () => {
@@ -95,29 +95,41 @@ export async function addGame(
   if (!players) throw new Error("Could not fetch players");
 
   // Calculate average ELO for each team
-  const redElo =
-    red.reduce(
-      (sum, id) => sum + (players.find((p: Player) => p.id === id)?.elo ?? 1000),
-      0
-    ) / red.length;
-  const blueElo =
-    blue.reduce(
-      (sum, id) => sum + (players.find((p: Player) => p.id === id)?.elo ?? 1000),
-      0
-    ) / blue.length;
+  const redPlayers = red.map(id => players.find((p: Player) => p.id === id)).filter(Boolean) as Player[];
+  const bluePlayers = blue.map(id => players.find((p: Player) => p.id === id)).filter(Boolean) as Player[];
+  
+  const redElos = redPlayers.map(p => p.elo);
+  const blueElos = bluePlayers.map(p => p.elo);
+  
+  const redTeamAvgElo = calculateTeamAverageElo(redElos);
+  const blueTeamAvgElo = calculateTeamAverageElo(blueElos);
 
   const redResult: 0 | 1 = redScore > blueScore ? 1 : 0;
   const blueResult: 0 | 1 = blueScore > redScore ? 1 : 0;
 
-  // Calculate new ELOs
+  // Calculate new ELOs using enhanced calculation
   const updates: { id: string; elo: number }[] = [];
-  red.forEach((id) => {
-    const p = players.find((pl: Player) => pl.id === id);
-    if (p) updates.push({ id, elo: calculateElo(p.elo, blueElo, redResult) });
+  
+  redPlayers.forEach((player) => {
+    const newElo = calculateElo(
+      player.elo, 
+      redTeamAvgElo, 
+      blueTeamAvgElo, 
+      redResult, 
+      red.length
+    );
+    updates.push({ id: player.id, elo: newElo });
   });
-  blue.forEach((id) => {
-    const p = players.find((pl: Player) => pl.id === id);
-    if (p) updates.push({ id, elo: calculateElo(p.elo, redElo, blueResult) });
+  
+  bluePlayers.forEach((player) => {
+    const newElo = calculateElo(
+      player.elo, 
+      blueTeamAvgElo, 
+      redTeamAvgElo, 
+      blueResult, 
+      blue.length
+    );
+    updates.push({ id: player.id, elo: newElo });
   });
 
   // Insert game
