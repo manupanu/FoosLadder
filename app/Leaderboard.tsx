@@ -3,23 +3,28 @@ import { Player } from "./foosballTypes";
 import { getPlayers as getPlayersDb } from "./foosballData";
 import { useState, useEffect } from "react";
 import PlayerStatsPanel from "./PlayerStatsPanel";
+import { exportPlayersAsCSV } from "./exportUtils";
 
 export default function Leaderboard() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPlayers = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         const playersData = await getPlayersDb();
         setPlayers(playersData);
-      } catch (error) {
-        console.error("Failed to fetch players:", error);
-        // Optionally, set an error state here to display to the user
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to load players";
+        setError(errorMessage);
+        console.error("Failed to fetch players:", err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     fetchPlayers();
   }, []);
@@ -30,6 +35,15 @@ export default function Leaderboard() {
 
   const handleCloseStats = () => {
     setSelectedPlayer(null);
+  };
+
+  const handleExportLeaderboard = () => {
+    try {
+      exportPlayersAsCSV(players);
+    } catch (err) {
+      console.error("Failed to export leaderboard:", err);
+      alert("Failed to export leaderboard. Please try again.");
+    }
   };
 
   if (isLoading) {
@@ -43,11 +57,45 @@ export default function Leaderboard() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="w-full rounded-xl shadow-lg p-6 bg-red-800/20 border border-red-500/50">
+        <h2 className="text-3xl font-bold mb-6 text-center text-red-300 drop-shadow-md">
+          Error 😥
+        </h2>
+        <div className="text-center text-red-200 py-8">Could not load leaderboard: {error}</div>
+      </div>
+    );
+  }
+
+  if (players.length === 0) {
+    return (
+      <div className="w-full rounded-xl shadow-lg p-6 bg-gradient-to-br from-charcoal-700 to-charcoal-800 border border-persian_green-500/30">
+        <h2 className="text-3xl font-bold mb-6 text-center text-saffron-400 drop-shadow-md">
+          🏆 Leaderboard
+        </h2>
+        <div className="text-center text-charcoal-300 py-8">No players registered yet. Add the first player! ✨</div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full rounded-xl shadow-lg p-6 bg-gradient-to-br from-charcoal-700 to-charcoal-800 border border-persian_green-500/30 animate-fadeInUp">
-      <h2 className="text-3xl font-bold mb-6 text-center text-saffron-400 drop-shadow-md">
-        🏆 Leaderboard
-      </h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-saffron-400 drop-shadow-md">
+          🏆 Leaderboard
+        </h2>
+        <button
+          onClick={handleExportLeaderboard}
+          className="bg-saffron-600 hover:bg-saffron-700 text-charcoal-800 font-medium px-4 py-2 rounded-lg transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-saffron-400"
+          title="Export leaderboard as CSV"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export CSV
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>

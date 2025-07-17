@@ -18,7 +18,35 @@ FoosLadder is a modern, clean, and responsive Next.js application designed to tr
 - **TypeScript First**: Developed with TypeScript for improved code quality and maintainability.
 - **Cloudflare Tunnel Integration**: Exposes the local development server to the internet via Cloudflare Tunnel for easy sharing and testing.
 
-## Tech Stack
+## Recent Improvements (January 2025)
+
+This version includes several enhancements for better security, reliability, and user experience:
+
+### 🔒 Security & Stability
+- **Security vulnerabilities fixed**: Updated Next.js to v15.4.1 to resolve cache poisoning vulnerability
+- **Build reliability improved**: Replaced Google Fonts with system font fallback to prevent network-related build failures
+- **Enhanced error handling**: Added comprehensive error boundaries and improved error messages
+- **Input validation**: Added robust validation for all form inputs and business rules
+
+### 🎯 User Experience Enhancements
+- **Export functionality**: Added CSV export for both leaderboard and game history
+- **Enhanced password gate**: Improved login experience with attempt tracking and better feedback
+- **Loading states**: Consistent loading indicators throughout the application
+- **Accessibility improvements**: Added proper ARIA labels, semantic HTML, and keyboard navigation
+- **Error feedback**: Better error and success message display with proper accessibility roles
+
+### ⚡ Performance & Features
+- **Enhanced ELO system**: Improved ELO calculation with team size considerations and minimum ELO bounds
+- **Confirmation dialogs**: Added reusable confirmation dialog component for future use
+- **Toast notifications**: Implemented toast notification system for better user feedback
+- **Error boundaries**: React error boundaries to gracefully handle component failures
+
+### 🛠 Developer Experience
+- **Type safety**: Enhanced TypeScript definitions and improved type checking
+- **Code organization**: Better separation of concerns and reusable components
+- **Documentation**: Improved code comments and documentation
+
+---
 
 - **Framework**: [Next.js](https://nextjs.org/) (v15+ with App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
@@ -160,7 +188,28 @@ The app will be available at [http://localhost:3000](http://localhost:3000) and 
 - `Dockerfile`: Instructions for building the FoosLadder application Docker image.
 - `.env.example`: Example environment file.
 
-## Color Palette
+## Enhanced ELO Rating System
+
+FoosLadder uses an advanced ELO rating system designed specifically for foosball games:
+
+### Key Features
+- **Team-aware calculations**: Properly handles both 1v1 and 2v2 matches
+- **Dynamic K-factor**: Adjusts rating changes based on upset potential and team size
+- **Minimum ELO protection**: Prevents ratings from dropping below 100
+- **Balanced team impact**: Reduces extreme rating swings in team games
+
+### How It Works
+1. **Team Average**: Calculates the average ELO for each team
+2. **Expected Outcome**: Uses standard ELO expected score formula
+3. **K-factor Adjustment**: 
+   - Base K-factor of 32
+   - Increases for bigger upsets (ELO difference > 200)
+   - Reduces by 20% for team games to prevent volatility
+4. **Individual Impact**: Slightly reduced in team games (90% vs 100%)
+
+This system ensures fair and meaningful rating changes regardless of game format!
+
+---
 
 The application uses a custom color palette defined in `tailwind.config.js`:
 

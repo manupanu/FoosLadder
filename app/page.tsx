@@ -4,6 +4,7 @@ import AddPlayerForm from "./AddPlayerForm";
 import AddGameForm from "./AddGameForm";
 import Leaderboard from "./Leaderboard";
 import LastGames from "./LastGames";
+import ErrorBoundary from "./ErrorBoundary";
 import { useState } from "react";
 import PasswordGate from "./PasswordGate";
 import Image from "next/image"; // Import the Image component
@@ -33,18 +34,26 @@ export default function Home() {
         <main className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
           {/* Left column for forms - now wider */}
           <div className="lg:col-span-2 flex flex-col gap-8">
-            <div className="bg-charcoal-700/60 rounded-xl p-6 shadow-xl border border-persian_green-500/30 backdrop-blur-sm">
-              <AddPlayerForm onPlayerAdded={triggerRefresh} />
-            </div>
-            <div className="bg-charcoal-700/60 rounded-xl p-6 shadow-xl border border-persian_green-500/30 backdrop-blur-sm">
-              <AddGameForm onGameAdded={triggerRefresh} />
-            </div>
+            <ErrorBoundary>
+              <div className="bg-charcoal-700/60 rounded-xl p-6 shadow-xl border border-persian_green-500/30 backdrop-blur-sm">
+                <AddPlayerForm onPlayerAdded={triggerRefresh} />
+              </div>
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <div className="bg-charcoal-700/60 rounded-xl p-6 shadow-xl border border-persian_green-500/30 backdrop-blur-sm">
+                <AddGameForm onGameAdded={triggerRefresh} />
+              </div>
+            </ErrorBoundary>
           </div>
 
           {/* Right column for leaderboard and last games - they will share this width */}
           <div className="lg:col-span-3 flex flex-col gap-8">
-            <Leaderboard key={`leaderboard-${refresh}`} />
-            <LastGames refreshKey={refresh} />
+            <ErrorBoundary>
+              <Leaderboard key={`leaderboard-${refresh}`} />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <LastGames refreshKey={refresh} />
+            </ErrorBoundary>
           </div>
         </main>
       </div>
